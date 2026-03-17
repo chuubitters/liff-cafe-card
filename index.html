@@ -121,7 +121,7 @@
             <p class="status-text">สะสมอีก 5 แต้ม เพื่อรับกาแฟฟรี 1 แก้ว!</p>
         </div>
 
-        <button id="scanBtn" class="scan-btn">📷 สแกนคิวอาร์รับแต้ม</button>
+        <button id="scanBtn" class="scan-btn">สแกนคิวอาร์รับแต้ม</button>
     </div>
 
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -144,39 +144,36 @@
 
         main();
 
-        // 🟢 ระบบจำลองสแกนแล้วบวกแต้ม
+// 🟢 ระบบจำลองสแกนแล้วบวกแต้ม (แบบชัวร์ 100% สำหรับพรีเซนต์)
         document.getElementById('scanBtn').addEventListener('click', async () => {
-            // เช็กว่าเปิดในมือถือหรือเปล่า (สแกนในคอมไม่ได้)
             if (!liff.isInClient()) {
                 alert('ต้องเปิดผ่านแอป LINE บนมือถือเท่านั้นถึงจะสแกนได้ครับ!');
                 return;
             }
 
             try {
-                // เปิดกล้องสแกน
-                const result = await liff.scanCodeV2();
-                
-                // ถ้าสแกนติด (รหัสอะไรก็ได้) ให้ทำแอนิเมชันเพิ่มแต้ม
-                if (result.value) {
-                    // หาดวงแต้มวงแรกที่ยังไม่เต็ม
-                    const inactiveStamps = document.querySelectorAll('.stamp-dot:not(.active)');
-                    
-                    if (inactiveStamps.length > 0) {
-                        inactiveStamps[0].classList.add('active'); // ระบายสีให้เต็ม
-                        
-                        const remaining = inactiveStamps.length - 1;
-                        document.querySelector('.status-text').innerText = `สะสมอีก ${remaining} แต้ม เพื่อรับกาแฟฟรี 1 แก้ว!`;
-                        
-                        // เด้งแจ้งเตือนว่าได้แต้ม
-                        setTimeout(() => {
-                            alert('🎉 ยินดีด้วย! คุณได้รับ 1 แต้ม');
-                        }, 300);
-                    } else {
-                        alert('แต้มของคุณเต็มแล้ว! แลกรับเครื่องดื่มได้เลย ☕');
-                    }
-                }
+                // 1. เปิดกล้องขึ้นมาให้แกล้งๆ สแกน
+                await liff.scanCodeV2();
             } catch (error) {
-                console.log('ลูกค้ายกเลิกการสแกน');
+                // ถ้ากดยกเลิก หรือ error ก็ปล่อยผ่านไปเลย
+                console.log('ปิดกล้อง');
+            }
+
+            // 2. 🟢 พอกล้องปิดปุ๊บ ไม่ง้อผลสแกน แจกแต้มทันที! (เซฟสุดๆ)
+            const inactiveStamps = document.querySelectorAll('.stamp-dot:not(.active)');
+            
+            if (inactiveStamps.length > 0) {
+                inactiveStamps[0].classList.add('active'); // ระบายสีแต้มวงถัดไปให้เต็ม
+                
+                const remaining = inactiveStamps.length - 1;
+                document.querySelector('.status-text').innerText = `สะสมอีก ${remaining} แต้ม เพื่อรับกาแฟฟรี 1 แก้ว!`;
+                
+                // ดีเลย์นิดนึงให้ดูเนียนๆ แล้วค่อยเด้งแจ้งเตือน
+                setTimeout(() => {
+                    alert(' ยินดีด้วย! คุณได้รับ 1 แต้ม');
+                }, 400);
+            } else {
+                alert('แต้มของคุณเต็มแล้ว! แลกรับเครื่องดื่มได้เลย ☕');
             }
         });
     </script>
