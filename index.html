@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Card - Interactive Cafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CSS ส่วนจัดหน้าตา (มินิมอลสไตล์) --- */
+        :root {
+            --primary-color: #6F4E37; /* สีน้ำตาลกาแฟ */
+            --bg-color: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        /* โลโก้ร้าน */
+        .logo {
+            width: 80px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        /* ส่วนโปรไฟล์ลูกค้า (ดึงจาก LINE) */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #EEEEEE;
+            padding-bottom: 15px;
+        }
+
+        #pictureUrl {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 2px solid var(--primary-color);
+        }
+
+        #displayName {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        /* การ์ดสะสมแต้ม */
+        .stamp-card {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px dashed var(--primary-color);
+        }
+
+        .stamp-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        /* วงกลมแต้ม */
+        .stamps-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stamp-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #DDDDDD;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #AAAAAA;
+        }
+
+        /* สไตล์แต้มที่สะสมแล้ว */
+        .stamp-dot.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #FFFFFF;
+        }
+
+        /* ข้อความบอกแต้ม */
+        .status-text {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666666;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+
+        <div class="profile-section">
+            <img src="" alt="Profile" id="pictureUrl"> <div id="displayName">กำลังโหลด...</div> </div>
+
+        <div class="stamp-card">
+            <h3>สะสมแต้ม</h3>
+            
+            <div class="stamps-grid">
+                <div class="stamp-dot active">1</div>
+                <div class="stamp-dot active">2</div>
+                <div class="stamp-dot active">3</div>
+                <div class="stamp-dot active">4</div>
+                <div class="stamp-dot active">5</div>
+                
+                <div class="stamp-dot">6</div>
+                <div class="stamp-dot">7</div>
+                <div class="stamp-dot">8</div>
+                <div class="stamp-dot">9</div>
+                <div class="stamp-dot">10</div>
+            </div>
+
+            <p class="status-text">สะสมอีก 5 แต้ม เพื่อรับกาแฟฟรี 1 แก้ว!</p>
+        </div>
+    </div>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    
+    <script>
+        // --- JS ส่วนดึงข้อมูลจาก LINE (สำคัญมาก) ---
+
+        // 🚨 เอา LIFF ID ของคุณมาใส่ตรงนี้แทนที่ 'YOUR_LIFF_ID'
+        const myLiffId = 'YOUR_LIFF_ID'; 
+
+        async function main() {
+            // 1. เริ่มใช้งาน LIFF
+            await liff.init({ liffId: myLiffId });
+
+            // 2. เช็กว่าเปิดใน LINE ไหม
+            if (liff.isLoggedIn()) {
+                // 3. ดึงข้อมูลโปรไฟล์ลูกค้า
+                const profile = await liff.getProfile();
+                
+                // 4. เอาข้อมูลไปใส่ในหน้าเว็บ
+                document.getElementById('displayName').innerText = profile.displayName;
+                document.getElementById('pictureUrl').src = profile.pictureUrl;
+                
+            } else {
+                // ถ้าเปิดนอก LINE ให้ล็อกอินก่อน (สำหรับทดสอบบนคอม)
+                liff.login();
+            }
+        }
+
+        main(); // เรียกใช้งานฟังก์ชันหลัก
+    </script>
+</body>
+</html>
